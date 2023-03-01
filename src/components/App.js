@@ -1,10 +1,11 @@
-import "./svgeditor.css";
-import React, { Component } from 'react';
-
+import "../style.css";
+// import { h, render, Component } from 'preact';
 // import Toast from "./Toast";
-import SVGRow from "./components/SVGRow";
-import ColorDropdown from "./components/ColorDropdown";
-import OptionBar from "./components/OptionBar";
+
+import { h, Component } from 'preact';
+// import Toast from "./Toast";
+import SVGRow from "./SVGRow";
+import ColorDropdown from "./ColorDropdown";
 
 class App extends Component {
 	constructor() {
@@ -18,6 +19,24 @@ class App extends Component {
 		}
 	}
 
+	// colors =
+	// 	{
+	// 		electricBlue: "#0097dc",
+	// 		richBlue: "#0c2340",
+	// 		purpleNavy: "#002f6c",
+	// 		rubyRed: "#b21f59",
+	// 		sapphireBlue: "#005eb8",
+	// 		riverTeal: "#00a19d",
+	// 		midnightGreen: "#0d5358",
+	// 		carrotOrange: "#f4623a",
+	// 		daisyYellow: "#fbaf34",
+	// 		seaGreen: "#34b556",
+	// 		skyBlue: "#50c0e8",
+	// 		teaRose: "#f69785",
+	// 		charcoalGrey: "#4a5363",
+	// 		lightGrey: "#d0d3d4",
+	// 		platinum: "#f4f5f6"
+	// 	}
 	colors =
 		[
 			{
@@ -156,27 +175,27 @@ class App extends Component {
 	componentDidMount() {
 		// look for query strings
 		// setup toasts
-		window.jQuery('.toast').toast({ delay: 4000 })
-
+		window.jQuery('.toast').toast({delay: 4000})
+		
 		// check for passed icon
-		let params = new URLSearchParams(window.location.search);
+		let params = new URLSearchParams(location.search);
 		let iconPath = params.get('icon')
-
-		if (iconPath != null) {
+		
+		if (iconPath != null){
 			let decodedPath = decodeURIComponent(iconPath)
 			console.log('decodedPath: ', decodedPath)
 			console.log('iconPath: ', iconPath)
 			fetch(iconPath)
-				.then(resp => resp.text())
-				.then(iconData => {
-					console.log('loaded icon: ', iconData)
-					this.updateInput(iconData)
-					window.jQuery('#toast-success').toast('show')
-				})
-				.catch((error) => {
-					console.error('Error loading icon:', error);
-					window.jQuery('#toast-failure').toast('show')
-				})
+			.then(resp => resp.text())
+			.then(iconData=>{
+				console.log('loaded icon: ', iconData)
+				this.updateInput(iconData)
+				window.jQuery('#toast-success').toast('show')
+			})
+			.catch((error) => {
+				 console.error('Error loading icon:', error);
+				 window.jQuery('#toast-failure').toast('show')
+			})
 		}
 	}
 
@@ -190,7 +209,7 @@ class App extends Component {
 		// remove dupes
 		if (foundColors != null) {
 			return foundColors.filter((m, i) => {
-				return foundColors.indexOf(m) === i;
+				return foundColors.indexOf(m) == i;
 			})
 		}
 		return [];
@@ -204,7 +223,8 @@ class App extends Component {
 		this.setState({ detectedColors: this.parseColors(newValue) })
 	}
 
-	recolor = (newHex, oldHex) => {
+	recolor = (ev, oldHex)=> {
+		let newHex = ev.target.value;
 		let newOutput = this.state.outText.replaceAll(oldHex, newHex)
 		this.setState({ outText: newOutput });
 	}
@@ -218,23 +238,34 @@ class App extends Component {
 	}
 	render() {
 		return (
-			<section class="bg-white">
+			<section class="bg-white mt-5 pt-5">
 				<div class="container">
 					<div class="row">
-						<SVGRow label="SVG Input" value={this.state.inText} setValue={this.onInInput} input />
-						<hr />
+						<SVGRow label="SVG Input Component" value={this.state.inText} setValue={this.onInInput} input />
+					</div>
+					<hr />
+					<div class="row">
 						<div class="col-12">
-							<h4>Colors</h4>
+							<h4>Detected Colors</h4>
 							<div class="d-flex">
 								{this.state.detectedColors.map(color =>
 									<ColorDropdown key={color} color={color} colorList={this.colors} recolor={this.recolor} />
 								)}
 							</div>
+							{/* <h4>Recolor</h4>
+							<div class="d-flex" id="recolorList">
+								<div class="form-group scheme-selector">
+									<label for="schemeList">Schemes</label>
+									<select class="recolor-schemes" name="schemeList" id="schemeList">
+										<option>- Choose from list -</option>
+									</select>
+								</div>
+							</div> */}
 						</div>
-						<hr />
-						<SVGRow label="SVG Output" value={this.state.outText} toggle="tooltip" tooltip="Copy text" />
-
-						<OptionBar />
+					</div>
+					<hr />
+					<div class="row">
+						<SVGRow label="SVG Output Component" value={this.state.outText} toggle="tooltip" tooltip="Copy text" />
 					</div>
 				</div>
 			</section>
